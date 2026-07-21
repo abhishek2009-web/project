@@ -1,0 +1,76 @@
+.mini-btn {
+  font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 20px;
+  border: 1px solid var(--cyan); background: rgba(51, 230, 255, 0.08); color: var(--cyan);
+  cursor: pointer; transition: all 0.25s;
+}
+.mini-btn:hover { background: rgba(51, 230, 255, 0.2); box-shadow: 0 0 14px var(--cyan-glow); }
+.mini-btn.gold { border-color: var(--gold); background: rgba(255, 181, 71, 0.08); color: var(--gold); }
+.mini-btn.gold:hover { background: rgba(255, 181, 71, 0.2); box-shadow: 0 0 14px var(--gold-glow); }
+/* ---------- Hero ---------- */
+.hero {
+  position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; padding: 120px 6vw 100px;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--ink-dim); margin-bottom: 26px; display: flex; align-items: center; gap: 12px;
+}
+.eyebrow::before, .eyebrow::after { content: ''; width: 34px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.eyebrow::after { background: linear-gradient(90deg, var(--cyan), transparent); }
+h1.title {
+  font-family: 'Sora', sans-serif; font-weight: 800; line-height: 0.98;
+  font-size: clamp(2.6rem, 7vw, 6.2rem); letter-spacing: -0.02em;
+  background: linear-gradient(120deg, #fff 10%, var(--gold) 45%, var(--cyan) 75%, #fff 100%);
+  background-size: 220% 220%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: sheen 7s ease-in-out infinite;
+  text-shadow: 0 0 60px rgba(255,181,71,0.15);
+  max-width: 16ch;
+  .division-block h4::before { content: ''; width: 16px; height: 1px; background: var(--accent); }
+.stat-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.stat-chip { background: rgba(255,255,255,0.03); border: 1px solid var(--panel-line); border-radius: 12px; padding: 14px 18px; flex: 1; min-width: 130px; }
+.stat-chip .num { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--accent); }
+.stat-chip .lbl { font-size: 11px; color: var(--ink-dim); margin-top: 4px; letter-spacing: 0.03em; }
+.task-steps { counter-reset: step; }
+.task-steps li { list-style: none; counter-increment: step; position: relative; padding-left: 34px; font-size: 13.5px; color: var(--ink-dim); line-height: 1.65; margin-bottom: 14px; }
+.task-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--accent); color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.task-steps li b { color: var(--ink); font-weight: 600; }
+.pill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 12px; font-family: 'JetBrains Mono', monospace; border: 1px solid var(--panel-line); color: var(--ink-dim); padding: 7px 13px; border-radius: 8px; transition: .25s; cursor: pointer; }
+.pill:hover { border-color: var(--accent); color: var(--ink); box-shadow: 0 0 14px var(--accent-glow); transform: translateY(-2px); }
+.pill.bid-placed { border-color: var(--green); color: var(--green); background: rgba(52, 211, 153, 0.1); }
+.twist-box {
+  margin-top: 26px; padding: 20px 22px; border-radius: 14px; background: rgba(255,181,71,0.05);
+  border: 1px dashed var(--accent); font-size: 13px; color: var(--ink-dim); line-height: 1.7;
+}
+.division.media .twist-box { background: rgba(51,230,255,0.05); }
+.twist-box b { color: var(--accent); display: block; font-family: 'Sora', sans-serif; font-size: 13px; margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+.bid-form select, .bid-form input {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--panel-line); border-radius: 10px; padding: 12px;
+  color: var(--ink); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color 0.25s;
+}
+.bid-form select:focus, .bid-form input:focus { border-color: var(--gold); }
+.auction-right-panel h3 { font-family: 'Sora', sans-serif; font-size: 1.1rem; margin-bottom: 12px; }
+.bid-history-list { max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 6px; }
+.bid-item {
+  background: rgba(255,255,255,0.02); border: 1px solid var(--panel-line); border-radius: 10px; padding: 10px 14px;
+  display: flex; justify-content: space-between; align-items: center; font-size: 13px;
+}
+.bid-item .brand-name { font-family: 'Sora', sans-serif; font-weight: 600; }
+.bid-item .bid-amt { font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 700; }
+.twist-result-box {
+  margin-top: 16px; padding: 16px; border-radius: 12px; background: rgba(51, 230, 255, 0.06);
+  border: 1px dashed var(--cyan); font-size: 12.5px; color: var(--ink-dim); line-height: 1.6;
+}
+.twist-result-box strong { color: var(--cyan); display: block; font-family: 'Sora', sans-serif; font-size: 12px; margin-bottom: 4px; }
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  nav .links { display: none; }
+  .temporal-dock { padding: 14px 16px; bottom: 12px; }
+  .dock-status-card { display: none; }
+  section { padding: 70px 6vw; }
+  .division { padding: 30px 22px 32px; }
+}
+  @media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
