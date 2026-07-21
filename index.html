@@ -1,40 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Real World Challenge — Educis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #05060c;
+    --bg-2: #0a0d18;
+    --panel: #0d1120;
+    --panel-line: rgba(255,255,255,0.08);
+    --ink: #eef0fb;
+    --ink-dim: #97a0c0;
+    --gold: #ffb547;
+    --gold-glow: rgba(255,181,71,0.55);
+    --cyan: #33e6ff;
+    --cyan-glow: rgba(51,230,255,0.55);
+    --violet: #7c6bff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  ::selection{background:var(--gold); color:#05060c;}
+
+  /* ---------- ambient background ---------- */
+  #bg-canvas{
+    position:fixed; inset:0; z-index:0; width:100%; height:100%; display:block;
+  }
+  .grain{
+    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 6vw;
+    backdrop-filter:blur(10px);
+    background:linear-gradient(to bottom, rgba(5,6,12,0.85), rgba(5,6,12,0));
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:'Sora',sans-serif; font-weight:700; letter-spacing:0.02em;}
+  .brand-mark{
+    width:30px; height:30px; position:relative; flex-shrink:0;
+  }
+  .brand-mark svg{ width:100%; height:100%; filter: drop-shadow(0 0 6px var(--gold-glow));}
+  .brand small{ display:block; font-family:'Inter'; font-weight:500; font-size:9px; letter-spacing:0.18em; color:var(--ink-dim); text-transform:uppercase;}
+  nav .links{ display:flex; gap:34px; font-size:13px; letter-spacing:0.03em; color:var(--ink-dim);}
+  nav .links a{ color:inherit; text-decoration:none; transition:color .25s; position:relative;}
+  nav .links a:hover{ color:var(--ink);}
+  nav .links a::after{
+    content:''; position:absolute; left:0; bottom:-6px; width:0; height:1px;
+    background:linear-gradient(90deg,var(--gold),var(--cyan)); transition:width .3s;
+  }
+  nav .links a:hover::after{ width:100%; }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative; z-index:2; min-height:100svh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:120px 6vw 60px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.32em; text-transform:uppercase;
+    color:var(--ink-dim); margin-bottom:26px; display:flex; align-items:center; gap:12px;
+  }
+  .eyebrow::before, .eyebrow::after{ content:''; width:34px; height:1px; background:linear-gradient(90deg, transparent, var(--gold)); }
+  .eyebrow::after{ background:linear-gradient(90deg, var(--cyan), transparent); }
+  h1.title{
+    font-family:'Sora', sans-serif; font-weight:800; line-height:0.98;
+    font-size: clamp(2.6rem, 7vw, 6.2rem); letter-spacing:-0.02em;
+    background:linear-gradient(120deg,#fff 10%, var(--gold) 45%, var(--cyan) 75%, #fff 100%);
+    background-size:220% 220%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:sheen 7s ease-in-out infinite;
+    text-shadow: 0 0 60px rgba(255,181,71,0.15);
+    max-width:16ch;
+  }
+  @keyframes sheen{ 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+  .subtitle{
+    max-width:640px; margin:26px auto 0; color:var(--ink-dim); font-size:1.05rem; line-height:1.7;
+  }
+  .hero-cta{ display:flex; gap:16px; margin-top:44px; flex-wrap:wrap; justify-content:center; }
+  .btn{
+    font-family:'Sora',sans-serif; font-weight:600; font-size:14px; padding:15px 30px; border-radius:100px;
+    text-decoration:none; letter-spacing:0.02em; transition:transform .3s, box-shadow .3s; cursor:pointer; border:1px solid transparent;
+  }
+  .btn.primary{ background:linear-gradient(100deg, var(--gold), #ff8a3d); color:#1a0f00; box-shadow:0 0 30px var(--gold-glow), 0 8px 24px rgba(0,0,0,.4); }
+  .btn.primary:hover{ transform:translateY(-3px); box-shadow:0 0 46px var(--gold-glow), 0 10px 28px rgba(0,0,0,.5); }
+  .btn.ghost{ border-color: var(--cyan); color:var(--cyan); box-shadow:0 0 18px rgba(51,230,255,.18) inset; }
+  .btn.ghost:hover{ background:rgba(51,230,255,0.08); box-shadow:0 0 30px var(--cyan-glow); transform:translateY(-3px); }
+
+  .scroll-cue{ position:absolute; bottom:34px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--ink-dim); font-size:10px; letter-spacing:0.25em; text-transform:uppercase;}
+  .scroll-cue .line{ width:1px; height:40px; background:linear-gradient(var(--ink-dim), transparent); animation:pulse-line 2s ease-in-out infinite;}
+  @keyframes pulse-line{ 0%,100%{opacity:.3;} 50%{opacity:1;} }
+
+  /* ---------- section shell ---------- */
+  section{ position:relative; z-index:2; padding:100px 6vw; }
+  .section-head{ max-width:760px; margin:0 auto 64px; text-align:center; }
+  .section-head .eyebrow{ justify-content:center; }
+  .section-head h2{ font-family:'Sora',sans-serif; font-weight:700; font-size:clamp(1.8rem,3.6vw,2.8rem); margin-top:14px; }
+  .section-head p{ color:var(--ink-dim); margin-top:16px; line-height:1.75; font-size:0.98rem; }
+
+  /* ---------- brief / stakes ---------- */
+  .stakes{ max-width:900px; margin:0 auto; }
+  .stakes-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--panel-line); border:1px solid var(--panel-line); border-radius:16px; overflow:hidden; margin-top:46px;}
+  .stake-item{ background:var(--panel); padding:26px 20px; text-align:center; }
+  .stake-item .tag{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); }
+  .stake-item p{ font-size:13px; color:var(--ink-dim); margin-top:10px; line-height:1.6; }
+
+  /* ---------- two-column division layout ---------- */
+  .arena{ padding-top:40px; }
+  .arena-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:36px; max-width:1280px; margin:0 auto;
+    perspective:1800px;
+  }
+  @media (max-width: 940px){ .arena-grid{ grid-template-columns:1fr; } }
+
+  .division{
+    position:relative; border-radius:22px; padding:38px 32px 40px;
+    background:linear-gradient(160deg, var(--panel) 0%, #0a0e1a 100%);
+    border:1px solid var(--panel-line);
+    transform-style:preserve-3d; transition:transform .12s ease-out, box-shadow .4s;
+    will-change:transform;
+  }
+  .division.biz{ --accent: var(--gold); --accent-glow: var(--gold-glow); }
+  .division.media{ --accent: var(--cyan); --accent-glow: var(--cyan-glow); }
+  .division::before{
+    content:''; position:absolute; inset:0; border-radius:22px; padding:1px;
+    background:linear-gradient(160deg, var(--accent), transparent 40%, transparent 70%, var(--accent));
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; opacity:0.55; pointer-events:none;
+  }
+  .division:hover{ box-shadow:0 30px 80px -20px var(--accent-glow); }
+
+  .division-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:8px; transform:translateZ(40px); }
+  .division-kicker{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent);}
+  .division h3{ font-family:'Sora',sans-serif; font-size:1.9rem; font-weight:700; margin-top:8px; }
+  .division-role{ font-size:12px; color:var(--ink-dim); border:1px solid var(--panel-line); padding:8px 12px; border-radius:10px; text-align:right; white-space:nowrap; }
+  .division-role b{ color:var(--accent); display:block; font-size:14px; font-family:'Sora',sans-serif; }
+  .division-intro{ color:var(--ink-dim); font-size:14px; line-height:1.75; margin:18px 0 28px; transform:translateZ(30px); }
+
+  .dept-list{ display:flex; flex-direction:column; gap:12px; transform:translateZ(30px); }
+  .dept{
+    background:rgba(255,255,255,0.02); border:1px solid var(--panel-line); border-radius:14px; padding:18px 20px;
+    transition:border-color .25s, background .25s;
+  }
+  .dept:hover{ border-color:var(--accent); background:rgba(255,255,255,0.035); }
+  .dept-top{ display:flex; align-items:center; gap:12px; }
+  .dept-num{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); border:1px solid var(--accent); width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 0 12px var(--accent-glow); }
+  .dept-name{ font-family:'Sora',sans-serif; font-weight:600; font-size:15px; }
+  .dept p{ font-size:13px; color:var(--ink-dim); margin-top:10px; line-height:1.65; }
+
+  .division-block{ margin-top:30px; transform:translateZ(25px); }
+  .division-block h4{ font-family:'Sora',sans-serif; font-size:13px; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+  .division-block h4::before{ content:''; width:16px; height:1px; background:var(--accent); }
+
+  .stat-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .stat-chip{ background:rgba(255,255,255,0.03); border:1px solid var(--panel-line); border-radius:12px; padding:14px 18px; flex:1; min-width:130px; }
+  .stat-chip .num{ font-family:'Sora',sans-serif; font-weight:700; font-size:1.3rem; color:var(--accent); }
+  .stat-chip .lbl{ font-size:11px; color:var(--ink-dim); margin-top:4px; letter-spacing:0.03em; }
+
+  .task-steps{ counter-reset:step; }
+  .task-steps li{ list-style:none; counter-increment:step; position:relative; padding-left:34px; font-size:13.5px; color:var(--ink-dim); line-height:1.65; margin-bottom:14px; }
+  .task-steps li::before{ content:counter(step); position:absolute; left:0; top:0; width:22px; height:22px; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid var(--accent); color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:11px; display:flex; align-items:center; justify-content:center; }
+  .task-steps li b{ color:var(--ink); font-weight:600; }
+
+  .pill-list{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pill{ font-size:12px; font-family:'JetBrains Mono',monospace; border:1px solid var(--panel-line); color:var(--ink-dim); padding:7px 13px; border-radius:8px; transition:.25s; }
+  .pill:hover{ border-color:var(--accent); color:var(--ink); box-shadow:0 0 14px var(--accent-glow); transform:translateY(-2px); }
+
+  .twist-box{
+    margin-top:26px; padding:20px 22px; border-radius:14px; background:rgba(255,181,71,0.05);
+    border:1px dashed var(--accent); font-size:13px; color:var(--ink-dim); line-height:1.7;
+  }
+  .division.media .twist-box{ background:rgba(51,230,255,0.05); }
+  .twist-box b{ color:var(--accent); display:block; font-family:'Sora',sans-serif; font-size:13px; margin-bottom:6px; letter-spacing:0.04em; text-transform:uppercase; }
+
+  /* ---------- flow / leadership section ---------- */
+  .flow{ max-width:1100px; margin:0 auto; }
+  .flow-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:20px; }
+  @media (max-width:800px){ .flow-grid{ grid-template-columns:1fr; } }
+  .flow-card{
+    background:var(--panel); border:1px solid var(--panel-line); border-radius:18px; padding:30px 26px;
+    position:relative; overflow:hidden; transform-style:preserve-3d; transition:transform .35s;
+  }
+  .flow-card:hover{ transform:translateY(-6px) rotateX(3deg); }
+  .flow-card .glow-orb{ position:absolute; width:140px; height:140px; border-radius:50%; filter:blur(50px); opacity:.35; top:-50px; right:-50px; background:radial-gradient(circle, var(--gold), transparent 70%); }
+  .flow-card:nth-child(2) .glow-orb{ background:radial-gradient(circle, var(--violet), transparent 70%); }
+  .flow-card:nth-child(3) .glow-orb{ background:radial-gradient(circle, var(--cyan), transparent 70%); }
+  .flow-card .step-index{ font-family:'JetBrains Mono',monospace; color:var(--ink-dim); font-size:12px; letter-spacing:0.2em; }
+  .flow-card h3{ font-family:'Sora',sans-serif; margin-top:12px; font-size:1.3rem; }
+  .flow-card p{ margin-top:14px; font-size:13.5px; color:var(--ink-dim); line-height:1.7; }
+
+  /* ---------- footer ---------- */
+  footer{ position:relative; z-index:2; padding:70px 6vw 40px; border-top:1px solid var(--panel-line); text-align:center; }
+  footer .brand{ justify-content:center; margin-bottom:18px; }
+  footer p{ color:var(--ink-dim); font-size:13px; line-height:1.9; }
+  footer a{ color:var(--ink-dim); text-decoration:none; border-bottom:1px dotted var(--ink-dim); }
+  footer a:hover{ color:var(--gold); border-color:var(--gold); }
+  .foot-locations{ margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.1em; color:#5b6280; }
+
+  @media (max-width:640px){
+    nav .links{ display:none; }
+    section{ padding:70px 6vw; }
+    .division{ padding:30px 22px 32px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="grain"></div>
+
+<nav>
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 2L36 20L20 38L4 20L20 2Z" stroke="url(#gradMark)" stroke-width="2"/>
+        <path d="M20 10L28 20L20 30L12 20L20 10Z" fill="url(#gradMark)" opacity="0.85"/>
+        <defs>
+          <linearGradient id="gradMark" x1="0" y1="0" x2="40" y2="40">
+            <stop offset="0" stop-color="#ffb547"/>
+            <stop offset="1" stop-color="#33e6ff"/>
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
+    <div>EDUCIS <small>Engage · Empower · Elevate</small></div>
+  </div>
+  <div class="links">
+    <a href="#brief">Briefing</a>
+    <a href="#arena">The Two Houses</a>
+    <a href="#flow">How It Runs</a>
+    <a href="#footer-contact">Contact</a>
   </div>
 </nav>
-<!-- 4D Simulation Control Dock (Floating Temporal Timeline) -->
-<aside class="temporal-dock" id="temporal-dock">
-  <div class="dock-header">
-    <div class="dock-title">
-      <span class="live-dot"></span> <strong>4D SIMULATION TIMELINE</strong>
-    </div>
-    <div class="dock-time-display" id="dock-time-display">09:00 AM</div>
-  </div>
-  
-  <div class="timeline-bar-container">
-    <input type="range" id="timeline-scrubber" min="0" max="100" value="0" step="1">
-    <div class="timeline-ticks">
-      <span class="tick active" data-step="0">09:00 AM<br><small>Briefing</small></span>
-      <span class="tick" data-step="25">10:30 AM<br><small>Auction</small></span>
-      <span class="tick" data-step="50">01:00 PM<br><small>Dept Tasks</small></span>
-      <span class="tick" data-step="75">04:00 PM<br><small>Final Pitch</small></span>
-      <span class="tick" data-step="100">06:00 PM<br><small>Results</small></span>
-    </div>
-  </div>
-  <div class="dock-status-card" id="dock-status-card">
-    <div class="status-phase">PHASE 01: SIMULATION ORIENTATION</div>
-    <div class="status-desc">All CEO and CEMO leaders assemble in main auditorium for initial House setup.</div>
-    <div class="status-actions">
-      <button class="mini-btn" id="btn-scrub-play">▶ Play 4D Time Cycle</button>
-      <button class="mini-btn gold" id="btn-launch-auction">🏷️ Open 3D Auction Engine</button>
-    </div>
-  </div>
-</aside>
-<!-- Hero Section -->
+
 <header class="hero">
   <div class="eyebrow">Real World Challenge · Simulation Program</div>
   <h1 class="title">Two Houses.<br>One Real World.</h1>
   <p class="subtitle">A live simulation where your school becomes a marketplace of ideas — a Corporate House bidding for brands, and a Media House chasing the story. Stumble here, so the real stakes never catch you unprepared.</p>
+  <div class="hero-cta">
+    <a href="#arena" class="btn primary">Enter the Arena</a>
+    <a href="#brief" class="btn ghost">Read the Briefing</a>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><div class="line"></div></div>
+</header>
+
+<section id="brief">
+  <div class="section-head">
+    <div class="eyebrow">A note for all participants</div>
+    <h2>Mistakes are cheap today. They won't be tomorrow.</h2>
+    <p>In politics, a misstep derails a career. In business, one bad call tarnishes a legacy. In a newsroom, a careless story wrecks trust built over years. Today, you get to make those mistakes without the weight of real consequence — each one a stepping stone for when the stakes are real.</p>
+  </div>
+  <div class="stakes">
+    <div class="stakes-grid">
+      <div class="stake-item"><div class="tag">Corporate</div><p>One ill-fated decision can tarnish a leader's legacy.</p></div>
+      <div class="stake-item"><div class="tag">Media</div><p>A misguided story can inflict lasting damage on credibility.</p></div>
+      <div class="stake-item"><div class="tag">Politics</div><p>A single misstep can derail a promising career.</p></div>
+      <div class="stake-item"><div class="tag">Law</div><p>A poorly built argument can jeopardise an entire case.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="arena" class="arena">
+  <div class="section-head">
+    <div class="eyebrow">Choose your house</div>
+    <h2>The Corporate House &amp; The Media House</h2>
+    <p>Two divisions, two disciplines, one event. Compete inside your own world — but remember, success on both sides demands you collaborate across the aisle.</p>
+  </div>
+
+  <div class="arena-grid">
+
+    <!-- BUSINESS & STRATEGY -->
+    <article class="division biz" id="tilt-biz">
+      <div class="division-head">
+        <div>
+          <div class="division-kicker">Division 01 · PDF Reference: Business &amp; Strategy Briefing</div>
+          <h3>Business &amp; Strategy</h3>
         </div>
+        <div class="division-role">Leads as<b>CEO</b></div>
+      </div>
+      <p class="division-intro">Your Corporate House is a living company. You'll split into three departments, bid for a real-world brand at auction, and run it under the pressure of live tasks — orchestrated by your CEO, not micromanaged by them.</p>
+
+      <div class="division-block">
+        <h4>Three Departments</h4>
+        <div class="dept-list">
+          <div class="dept">
+            <div class="dept-top"><span class="dept-num">1</span><span class="dept-name">Advertising &amp; Marketing</span></div>
+            <p>The bridge between company and public — builds campaigns, posters, and messages that make the product recognisable, exciting, and trusted.</p>
+          </div>
+          <div class="dept">
+            <div class="dept-top"><span class="dept-num">2</span><span class="dept-name">Corporate Social Responsibility</span></div>
+            <p>Design a self-sustaining social enterprise around a real issue — education, environment, health, equality — that earns enough to keep making impact.</p>
+          </div>
+          <div class="dept">
+            <div class="dept-top"><span class="dept-num">3</span><span class="dept-name">Intrapreneurship</span></div>
+            <p>Pitch a new for-profit idea from inside the Corporate House: the problem it solves, who it helps, how it earns, and why it's innovative.</p>
+          </div>
+        </div>
+      </div>
+
       <div class="division-block">
         <h4>The Auction</h4>
         <div class="stat-row">
@@ -47,31 +325,121 @@
           Bidding runs until only one team is left without a company. That final team automatically receives the remaining brand — priced at the average of every previous bid, rounded to the nearest 1,000. Golden opportunity, or costly surprise?
         </div>
       </div>
+
       <div class="division-block">
-        <h4>Brands on the block <small>(Interactive simulator)</small></h4>
-        <div class="pill-list" id="biz-pill-list">
-          <span class="pill" data-brand="Tata Motors">Tata Motors</span>
-          <span class="pill" data-brand="Tesla">Tesla</span>
-          <span class="pill" data-brand="FabIndia">FabIndia</span>
-          <span class="pill" data-brand="Zara">Zara</span>
-          <span class="pill" data-brand="Etihad">Etihad</span>
-          <span class="pill" data-brand="Emirates">Emirates</span>
-          <span class="pill" data-brand="Jio">Jio</span>
-          <span class="pill" data-brand="Airtel">Airtel</span>
-          <span class="pill" data-brand="Uber">Uber</span>
-          <span class="pill" data-brand="Ola">Ola</span>
-          <span class="pill" data-brand="Airbnb">Airbnb</span>
-          <span class="pill" data-brand="Coca-Cola">Coca-Cola</span>
-          <span class="pill" data-brand="Pepsi">Pepsi</span>
-          <span class="pill" data-brand="MakeMyTrip">MakeMyTrip</span>
-          <span class="pill" data-brand="Zomato">Zomato</span>
+        <h4>Brands on the block</h4>
+        <div class="pill-list">
+          <span class="pill">Tata Motors</span><span class="pill">Tesla</span><span class="pill">FabIndia</span>
+          <span class="pill">Zara</span><span class="pill">Etihad</span><span class="pill">Emirates</span>
+          <span class="pill">Jio</span><span class="pill">Airtel</span><span class="pill">Uber</span>
+          <span class="pill">Ola</span><span class="pill">Airbnb</span><span class="pill">Coca-Cola</span>
+          <span class="pill">Pepsi</span><span class="pill">MakeMyTrip</span><span class="pill">Zomato</span>
         </div>
-        <button class="btn primary full-width margin-top-16" id="btn-open-auction-modal">⚡ Launch Interactive Live Auction Simulator</button>
-              </div>
+      </div>
+
+      <div class="division-block">
+        <h4>How the day runs</h4>
+        <ol class="task-steps">
+          <li><b>Pick your CEO</b> and split into three departments — a suggested 3 members each for balance.</li>
+          <li><b>Bid live</b> at the auction to secure your brand, with your CEO authorising every rupee spent.</li>
+          <li><b>Move to your department room</b> and receive live tasks with real deadlines from your mentor.</li>
+        </ol>
+      </div>
+    </article>
+
+    <!-- MEDIA & COMMUNICATION -->
+    <article class="division media" id="tilt-media">
+      <div class="division-head">
+        <div>
+          <div class="division-kicker">Division 02 · PDF Reference: Media &amp; Communication Briefing</div>
+          <h3>Media &amp; Communication</h3>
+        </div>
+        <div class="division-role">Leads as<b>CEMO</b></div>
+      </div>
+      <p class="division-intro">Your Media House is the fourth pillar of this simulation — watching, verifying, and reporting on everything the Corporate, Political, and Law Houses do. Fast-paced, occasionally chaotic, always essential.</p>
+
+      <div class="division-block">
+        <h4>Three Departments</h4>
+        <div class="dept-list">
+          <div class="dept">
+            <div class="dept-top"><span class="dept-num">1</span><span class="dept-name">News Department</span></div>
+            <p>The heart of the house — gathers information, verifies facts, runs interviews, and reports clearly and without bias.</p>
+          </div>
+          <div class="dept">
+            <div class="dept-top"><span class="dept-num">2</span><span class="dept-name">Editorial &amp; Ethics</span></div>
+            <p>Reviews every story for fairness, balance, and sensitivity — deciding how a story is framed, and whether it runs at all.</p>
+          </div>
+          <div class="dept">
+            <div class="dept-top"><span class="dept-num">3</span><span class="dept-name">Digital &amp; Media Innovation</span></div>
+            <p>Owns how the news actually reaches people — social strategy, headlines, short-form video, and new digital formats.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="division-block">
+        <h4>Key Tasks</h4>
+        <div class="stat-row">
+          <div class="stat-chip"><div class="num">Live</div><div class="lbl">Official social handle</div></div>
+          <div class="stat-chip"><div class="num">1</div><div class="lbl">Bulletin board to maintain</div></div>
+          <div class="stat-chip"><div class="num">All</div><div class="lbl">Houses to cover</div></div>
+        </div>
+        <div class="twist-box">
+          <b>Journalistic standard</b>
+          Every post must be accurate, engaging, and timely — no fake news, clear reporting, fair coverage. Mentors will drop news events and deadlines throughout the day, so the room has to stay alert and adaptable.
+        </div>
+      </div>
+
+      <div class="division-block">
+        <h4>Your four running tasks</h4>
+        <div class="pill-list">
+          <span class="pill">Social Media Coverage</span><span class="pill">Activity Bulletin Board</span>
+          <span class="pill">Cross-House Collaboration</span><span class="pill">Deadlines &amp; Mentorship</span>
+        </div>
+      </div>
+
+      <div class="division-block">
+        <h4>How the day runs</h4>
+        <ol class="task-steps">
+          <li><b>Pick your CEMO</b> and split into three departments — a suggested 3 members each for balance.</li>
+          <li><b>Move to your assigned room</b> and start performing your role under your department mentor.</li>
+          <li><b>Cover the whole event live</b> — interview participants, verify claims, and file stories on deadline.</li>
+        </ol>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section id="flow">
+  <div class="section-head">
+    <div class="eyebrow">The bigger picture</div>
+    <h2>Compete within your world. Win by working across it.</h2>
+    <p>Neither house battles the other directly — Business competes with Business, Media with Media. But the top spot only comes to teams that lean on the divisions around them.</p>
+  </div>
+  <div class="flow">
+    <div class="flow-grid">
+      <div class="flow-card">
+        <div class="glow-orb"></div>
+        <div class="step-index">LEADERSHIP</div>
+        <h3>Responsibility, not advantage</h3>
+        <p>A CEO or CEMO isn't the person with the most power — they're the one who ensures everything gets done. Orchestrate, delegate, and empower; step in only when it truly matters.</p>
+      </div>
+      <div class="flow-card">
+        <div class="glow-orb"></div>
+        <div class="step-index">MENTORSHIP</div>
+        <h3>Mentors first, judges later</h3>
+        <p>Every department mentor is there to guide you through live tasks and deadlines — ask them anything. The goal is to learn while you perform, never to feel lost.</p>
+      </div>
+      <div class="flow-card">
+        <div class="glow-orb"></div>
+        <div class="step-index">COLLABORATION</div>
+        <h3>Cross-house interaction</h3>
+        <p>Media covers Business announcements; Business responds to press coverage. The simulation only feels real when both houses treat each other as part of the same world.</p>
+      </div>
     </div>
   </div>
 </section>
-<!-- Footer -->
+
 <footer id="footer-contact">
   <div class="brand">
     <div class="brand-mark">
@@ -93,51 +461,146 @@
   </p>
   <p class="foot-locations">MUMBAI · GURUGRAM · DEHRADUN · BHOPAL</p>
 </footer>
-<!-- Interactive 3D Auction Simulator Modal -->
-<div class="modal-backdrop" id="auction-modal">
-  <div class="modal-box">
-    <button class="modal-close" id="btn-close-auction">&times;</button>
-    <div class="modal-header">
-      <div class="modal-eyebrow">Interactive Simulation Module</div>
-      <h2>3D Live Brand Auction Engine</h2>
-      <p>Simulate bidding for real-world corporate brands under RWC rules.</p>
-    </div>
-    <div class="auction-grid-container">
-                  <option value="MakeMyTrip">MakeMyTrip</option>
-            <option value="Zomato">Zomato</option>
-          </select>
-          <label>Your Bid Amount ($):</label>
-          <input type="number" id="auction-bid-input" placeholder="e.g. 15000" min="1000" step="1000" value="12000">
-          <button class="btn primary full-width" id="btn-place-bid">🔨 Submit Official Bid</button>
-          <button class="btn ghost full-width margin-top-8" id="btn-trigger-twist">⚖️ Calculate High-Stakes Twist Penalty</button>
-        </div>
-      </div>
-      <div class="auction-right-panel">
-        <h3>Live Bidding Ledger (15 Brands)</h3>
-        <div class="bid-history-list" id="bid-history-list">
-          <!-- Populated by JS -->
-        </div>
-        <div class="twist-result-box" id="twist-result-box">
-          <strong>HIGH-STAKES TWIST ALGORITHM</strong>
-          <p>Click "Calculate High-Stakes Twist Penalty" to simulate the remaining unbid brand price calculation rule!</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Department 3D Inspection Modal -->
-<div class="modal-backdrop" id="dept-modal">
-  <div class="modal-box small">
-    <button class="modal-close" id="btn-close-dept">&times;</button>
-    <div class="modal-header">
-      <div class="modal-eyebrow" id="dept-modal-house">CORPORATE HOUSE</div>
-      <h2 id="dept-modal-title">Department Focus</h2>
-    </div>
-    <div class="dept-modal-body" id="dept-modal-body">
-      <!-- Populated dynamically by JS -->
-    </div>
-  </div>
-</div>
-<script src="main.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // ---------------- 3D ambient background (glowing dual-nucleus lattice) ----------------
+  (function(){
+    const canvas = document.getElementById('bg-canvas');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 9);
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // Two glowing wireframe icosahedra representing the two houses, orbiting a shared core
+    function makeNode(color, radius){
+      const geo = new THREE.IcosahedronGeometry(radius, 1);
+      const mat = new THREE.MeshBasicMaterial({ color, wireframe:true, transparent:true, opacity:0.85 });
+      const mesh = new THREE.Mesh(geo, mat);
+      const glowGeo = new THREE.IcosahedronGeometry(radius*1.35, 1);
+      const glowMat = new THREE.MeshBasicMaterial({ color, wireframe:true, transparent:true, opacity:0.12 });
+      const glow = new THREE.Mesh(glowGeo, glowMat);
+      const holder = new THREE.Group();
+      holder.add(mesh); holder.add(glow);
+      return { holder, mesh, glow };
+    }
+
+    const nodeA = makeNode(0xffb547, 1.15); // Business — gold
+    const nodeB = makeNode(0x33e6ff, 1.15); // Media — cyan
+    nodeA.holder.position.set(-2.6, 0.4, 0);
+    nodeB.holder.position.set(2.6, -0.4, 0);
+    group.add(nodeA.holder, nodeB.holder);
+
+    // Connective particle field between + around the two nodes
+    const PARTICLES = 260;
+    const positions = new Float32Array(PARTICLES*3);
+    for(let i=0;i<PARTICLES;i++){
+      const t = Math.random();
+      const spread = 6.5;
+      positions[i*3]   = (Math.random()-0.5)*spread*2.2;
+      positions[i*3+1] = (Math.random()-0.5)*spread;
+      positions[i*3+2] = (Math.random()-0.5)*spread*0.6 - 1.5;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const pMat = new THREE.PointsMaterial({ color:0x8fa2ff, size:0.028, transparent:true, opacity:0.55 });
+    const points = new THREE.Points(pGeo, pMat);
+    group.add(points);
+
+    // subtle central core linking both houses
+    const coreGeo = new THREE.OctahedronGeometry(0.4, 0);
+    const coreMat = new THREE.MeshBasicMaterial({ color:0xffffff, wireframe:true, transparent:true, opacity:0.4 });
+    const core = new THREE.Mesh(coreGeo, coreMat);
+    group.add(core);
+
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (e)=>{
+      mouseX = (e.clientX/window.innerWidth - 0.5);
+      mouseY = (e.clientY/window.innerHeight - 0.5);
+    });
+
+    function resize(){
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    window.addEventListener('resize', resize);
+
+    const clock = new THREE.Clock();
+    function animate(){
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      if(!reduceMotion){
+        nodeA.holder.rotation.x = t*0.18;
+        nodeA.holder.rotation.y = t*0.26;
+        nodeB.holder.rotation.x = -t*0.2;
+        nodeB.holder.rotation.y = -t*0.24;
+        core.rotation.y = t*0.4;
+        core.rotation.x = t*0.3;
+        points.rotation.y = t*0.02;
+
+        nodeA.holder.position.y = 0.4 + Math.sin(t*0.6)*0.18;
+        nodeB.holder.position.y = -0.4 + Math.cos(t*0.5)*0.18;
+
+        group.rotation.y += (mouseX*0.3 - group.rotation.y*0.3)*0.03;
+        group.rotation.x += (mouseY*0.15 - group.rotation.x*0.3)*0.03;
+      }
+      renderer.render(scene, camera);
+    }
+    animate();
+  })();
+</script>
+
+<script>
+  // ---------------- CSS 3D tilt interaction for division cards ----------------
+  (function(){
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduceMotion) return;
+    const cards = [document.getElementById('tilt-biz'), document.getElementById('tilt-media')];
+    cards.forEach(card=>{
+      if(!card) return;
+      let raf = null;
+      card.addEventListener('mousemove', (e)=>{
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left)/rect.width - 0.5;
+        const y = (e.clientY - rect.top)/rect.height - 0.5;
+        if(raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(()=>{
+          card.style.transform = `rotateY(${x*6}deg) rotateX(${-y*6}deg) translateY(-4px)`;
+        });
+      });
+      card.addEventListener('mouseleave', ()=>{
+        card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+      });
+    });
+  })();
+</script>
+
+<script>
+  // ---------------- reveal-on-scroll ----------------
+  (function(){
+    const targets = document.querySelectorAll('.division, .flow-card, .stake-item');
+    targets.forEach(el=>{ el.style.opacity=0; el.style.transform += ' translateY(24px)'; el.style.transition='opacity .7s ease, transform .7s ease'; });
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = entry.target.style.transform.replace(' translateY(24px)', '');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold:0.15 });
+    targets.forEach(el=>io.observe(el));
+  })();
+</script>
+
 </body>
 </html>
